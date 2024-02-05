@@ -25,14 +25,9 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import de.doubleslash.keeptime.model.Authorities;
-import de.doubleslash.keeptime.model.User;
-import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
-import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -64,18 +59,17 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-import javax.print.attribute.standard.PrinterURI;
-
 @Component
 public class SettingsController {
-
    @FXML
    private ColorPicker hoverBackgroundColor;
+
    @FXML
    private ColorPicker hoverFontColor;
 
    @FXML
    private ColorPicker defaultBackgroundColor;
+
    @FXML
    private ColorPicker defaultFontColor;
 
@@ -84,21 +78,28 @@ public class SettingsController {
 
    @FXML
    private Button resetHoverBackgroundButton;
+
    @FXML
    private Button resetHoverFontButton;
+
    @FXML
    private Button resetDefaultBackgroundButton;
+
    @FXML
    private Button resetDefaultFontButton;
+
    @FXML
    private Button resetTaskBarFontButton;
 
    @FXML
    private CheckBox useHotkeyCheckBox;
+
    @FXML
    private CheckBox displayProjectsRightCheckBox;
+
    @FXML
    private CheckBox hideProjectsOnMouseExitCheckBox;
+
    @FXML
    private CheckBox saveWindowPositionCheckBox;
 
@@ -180,12 +181,6 @@ public class SettingsController {
    @FXML
    private RadioButton radioApiOn;
 
-   @Autowired
-   private UserRepository userRepository;
-
-   @Autowired
-   private AuthoritiesRepository authoritiesRepository;
-
    @FXML
    private TextField authPort;
 
@@ -203,38 +198,15 @@ public class SettingsController {
 
    private Stage thisStage;
 
-   private String username;
-   private String password;
-
-   @FXML
-   private Label labelPassword;
-
-   @FXML
-   private Label labelPort;
-
-   @FXML
-   private Label labelUsername;
-
-   User user;
-
    @Autowired
    ViewController mainscreen;
 
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties, final UserRepository userRepository) {
+         ApplicationProperties applicationProperties) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
-      this.userRepository = userRepository;
-      this.YYY();
 
-   }
-
-   private void YYY() {
-      final List<User> users = userRepository.findAll();
-      if (!users.isEmpty()) {
-         user = users.get(0);
-      }
    }
 
    @FXML
@@ -279,15 +251,17 @@ public class SettingsController {
                radioApiOn.setSelected(true);
                radioApiOff.setSelected(false);
                String port = properties.getProperty("server.port");
+               String userName = properties.getProperty("spring.security.user.name");
+               String userPassword = properties.getProperty("spring.security.user.password");
 
-               if(user!=null){
-               authName.setText(user.getUserName());
-               }
                if (port != null) {
                   authPort.setText(port);
+
                }
-               if (username != null) {
-                  authName.setText(username);
+               if  (userName!= null) {
+                  authName.setText(LoginController.extractValue(userName));
+                  authPassword.setText(LoginController.extractValue(userPassword));
+
                }
             } else if (apistatus.equals("OFF")) {
                radioApiOn.setSelected(false);
@@ -295,7 +269,7 @@ public class SettingsController {
             }
          }
       } catch (IOException e) {
-         e.printStackTrace();
+        LOG.warn("There is currently no application.properties available");
       }
 
       LOG.debug("saveButton.setOnAction");
@@ -468,15 +442,13 @@ public class SettingsController {
 
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.getDialogPane()
-                             .setContent(new Label(
-                                   """
-                                   Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
-                                   
-                                   If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
-                                   
-                                   You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
-                                   """));
+            confirmationAlert.getDialogPane().setContent(new Label("""
+                  Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
+                                                     
+                  If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
+                                                     
+                  You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
+                  """));
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -498,11 +470,12 @@ public class SettingsController {
             final String password = applicationProperties.getSpringDataSourcePassword();
 
             if (file.getName().contains("H2-version-1")) {
-               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
-                       "-options", "FROM_1X");
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString(), "-options", "FROM_1X");
                LOG.info("FROM_1X feature is used");
-            }else {
-               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString());
+            } else {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString());
             }
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
@@ -512,11 +485,10 @@ public class SettingsController {
 
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.getDialogPane()
-                             .setContent(new Label("""
-                                   KeepTime will now be CLOSED!
-                                   You have to RESTART it again to see the changes\
-                                   """));
+            informationDialog.getDialogPane().setContent(new Label("""
+                  KeepTime will now be CLOSED!
+                  You have to RESTART it again to see the changes\
+                  """));
             informationDialog.showAndWait();
             Platform.exit();
 
@@ -623,13 +595,9 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
       licenseRows.add(new LicenseTableRow("mapstruct", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("mapstruct-processor", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("jackson-databind", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("javax.xml.bind", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("maven-compiler-plugin", Licenses.APACHEV2));
-
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
       return licenseRows;
@@ -658,16 +626,20 @@ public class SettingsController {
    }
 
    private void handleApiOn() {
-      username = authName.getText();
-      password = authPassword.getText();
+      String username = authName.getText();
+      String password = authPassword.getText();
 
-      createAndSaveUser(username, password);
+      LoginController loginController = new LoginController(username, password);
+
+      loginController.createAndSaveUser();
 
       Map<String, String> propertiesToUpdate = new HashMap<>();
       propertiesToUpdate.put("spring.main.web-application-type", "");
       propertiesToUpdate.put("server.port", authPort.getText());
       propertiesToUpdate.put("api", "ON");
-      propertiesToUpdate.put("authUsername", username);
+
+      propertiesToUpdate.put("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
+      propertiesToUpdate.put("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
       propertyWrite(propertiesToUpdate);
    }
 
@@ -675,24 +647,7 @@ public class SettingsController {
       propertyWrite("spring.main.web-application-type", value);
    }
 
-   private void createAndSaveUser(String username, String password) {
-      Authorities authorities = new Authorities();
-
-      userRepository.deleteAll();
-      authoritiesRepository.deleteAll();
-
-      user.setUserName(username);
-      user.setPassword("{noop}" + password);
-      user.setEnabled(true);
-
-      authorities.setUserName(username);
-      authorities.setAuthority("ROLE_USER");
-
-      userRepository.save(user);
-      authoritiesRepository.save(authorities);
-   }
-
-   private void propertyWrite(String key, String value) {
+   public void propertyWrite(String key, String value) {
       Properties properties = new Properties();
       try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
             FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
@@ -723,4 +678,5 @@ public class SettingsController {
          e.printStackTrace();
       }
    }
+
 }
