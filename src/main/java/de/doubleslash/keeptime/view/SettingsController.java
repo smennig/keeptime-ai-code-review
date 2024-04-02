@@ -25,14 +25,9 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import de.doubleslash.keeptime.model.Authorities;
-import de.doubleslash.keeptime.model.User;
-import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
-import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -63,8 +58,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-
-import javax.print.attribute.standard.PrinterURI;
 
 @Component
 public class SettingsController {
@@ -180,12 +173,6 @@ public class SettingsController {
    @FXML
    private RadioButton radioApiOn;
 
-   @Autowired
-   private UserRepository userRepository;
-
-   @Autowired
-   private AuthoritiesRepository authoritiesRepository;
-
    @FXML
    private TextField authPort;
 
@@ -215,32 +202,30 @@ public class SettingsController {
    @FXML
    private Label labelUsername;
 
-   User user;
-
    @Autowired
    ViewController mainscreen;
 
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties, final UserRepository userRepository) {
+         ApplicationProperties applicationProperties) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
-      this.userRepository = userRepository;
-      this.setDefaultUserAndPassword();
+      //      setDefaultUserAndPassword();
 
    }
 
    private void setDefaultUserAndPassword() {
-      final List<User> users = userRepository.findAll();
-      if (!users.isEmpty()) {
-         user = users.get(0);
-      } else {
 
-         user = new User();
-         user.setUserName("user");
-         user.setPassword("123");
-         user.setEnabled(true);
-      }
+      username = authName.getText();
+      password = authPassword.getText();
+
+      createAndSaveUser(username, password);
+
+      Properties properties = new Properties();
+      //      System.setProperty("BASIC_AUTH_USER", "admin");
+      //      System.setProperty("BASIC_AUTH_PASSWORD", "123");
+      properties.put("spring.security.user.name", "${BASIC_AUTH_USER:" + "admin" + "}");
+      properties.put("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + "admin" + "}");
    }
 
    @FXML
@@ -286,9 +271,9 @@ public class SettingsController {
                radioApiOff.setSelected(false);
                String port = properties.getProperty("server.port");
 
-               if (user != null) {
-                  authName.setText(user.getUserName());
-               }
+               //               if (user != null) {
+               //                  authName.setText(user.getUserName());
+               //               }
                if (port != null) {
                   authPort.setText(port);
                }
@@ -667,7 +652,12 @@ public class SettingsController {
       propertiesToUpdate.put("spring.main.web-application-type", "");
       propertiesToUpdate.put("server.port", authPort.getText());
       propertiesToUpdate.put("api", "ON");
-      propertiesToUpdate.put("authUsername", username);
+
+      //            propertiesToUpdate.put("authUsername", username);
+      propertiesToUpdate.put("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
+      propertiesToUpdate.put("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
+      //      System.setProperty("BASIC_AUTH_USER", username);
+      //      System.setProperty("BASIC_AUTH_PASSWORD", password);
       propertyWrite(propertiesToUpdate);
    }
 
@@ -676,20 +666,12 @@ public class SettingsController {
    }
 
    private void createAndSaveUser(String username, String password) {
-      Authorities authorities = new Authorities();
+      Properties properties = new Properties();
+      properties.setProperty("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
+      properties.setProperty("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
+      //      System.setProperty("BASIC_AUTH_USER", username);
+      //      System.setProperty("BASIC_AUTH_PASSWORD", password);
 
-      userRepository.deleteAll();
-      authoritiesRepository.deleteAll();
-
-      user.setUserName(username);
-      user.setPassword("{noop}" + password);
-      user.setEnabled(true);
-
-      authorities.setUserName(username);
-      authorities.setAuthority("ROLE_USER");
-
-      userRepository.save(user);
-      authoritiesRepository.save(authorities);
    }
 
    private void propertyWrite(String key, String value) {
