@@ -61,14 +61,15 @@ import javafx.stage.Stage;
 
 @Component
 public class SettingsController {
-
    @FXML
    private ColorPicker hoverBackgroundColor;
+
    @FXML
    private ColorPicker hoverFontColor;
 
    @FXML
    private ColorPicker defaultBackgroundColor;
+
    @FXML
    private ColorPicker defaultFontColor;
 
@@ -77,21 +78,28 @@ public class SettingsController {
 
    @FXML
    private Button resetHoverBackgroundButton;
+
    @FXML
    private Button resetHoverFontButton;
+
    @FXML
    private Button resetDefaultBackgroundButton;
+
    @FXML
    private Button resetDefaultFontButton;
+
    @FXML
    private Button resetTaskBarFontButton;
 
    @FXML
    private CheckBox useHotkeyCheckBox;
+
    @FXML
    private CheckBox displayProjectsRightCheckBox;
+
    @FXML
    private CheckBox hideProjectsOnMouseExitCheckBox;
+
    @FXML
    private CheckBox saveWindowPositionCheckBox;
 
@@ -193,15 +201,6 @@ public class SettingsController {
    private String username;
    private String password;
 
-   @FXML
-   private Label labelPassword;
-
-   @FXML
-   private Label labelPort;
-
-   @FXML
-   private Label labelUsername;
-
    @Autowired
    ViewController mainscreen;
 
@@ -210,22 +209,7 @@ public class SettingsController {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
-      //      setDefaultUserAndPassword();
 
-   }
-
-   private void setDefaultUserAndPassword() {
-
-      username = authName.getText();
-      password = authPassword.getText();
-
-      createAndSaveUser(username, password);
-
-      Properties properties = new Properties();
-      //      System.setProperty("BASIC_AUTH_USER", "admin");
-      //      System.setProperty("BASIC_AUTH_PASSWORD", "123");
-      properties.put("spring.security.user.name", "${BASIC_AUTH_USER:" + "admin" + "}");
-      properties.put("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + "admin" + "}");
    }
 
    @FXML
@@ -270,10 +254,6 @@ public class SettingsController {
                radioApiOn.setSelected(true);
                radioApiOff.setSelected(false);
                String port = properties.getProperty("server.port");
-
-               //               if (user != null) {
-               //                  authName.setText(user.getUserName());
-               //               }
                if (port != null) {
                   authPort.setText(port);
                }
@@ -653,11 +633,8 @@ public class SettingsController {
       propertiesToUpdate.put("server.port", authPort.getText());
       propertiesToUpdate.put("api", "ON");
 
-      //            propertiesToUpdate.put("authUsername", username);
       propertiesToUpdate.put("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
       propertiesToUpdate.put("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
-      //      System.setProperty("BASIC_AUTH_USER", username);
-      //      System.setProperty("BASIC_AUTH_PASSWORD", password);
       propertyWrite(propertiesToUpdate);
    }
 
@@ -669,9 +646,6 @@ public class SettingsController {
       Properties properties = new Properties();
       properties.setProperty("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
       properties.setProperty("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
-      //      System.setProperty("BASIC_AUTH_USER", username);
-      //      System.setProperty("BASIC_AUTH_PASSWORD", password);
-
    }
 
    private void propertyWrite(String key, String value) {
