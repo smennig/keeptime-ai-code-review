@@ -14,14 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model;
+package de.doubleslash.keeptime.REST_API.mapper;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
+import de.doubleslash.keeptime.model.Project;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-public class ScreenSettings {
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> proportionalX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> proportionalY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+@Mapper(uses = ColorMapper.class)
+public interface ProjectMapper {
+
+   ProjectMapper INSTANCE = Mappers.getMapper(ProjectMapper.class);
+
+   ProjectColorDTO projectToProjectDTO(Project project);
+
+   Project projectDTOToProject(ProjectColorDTO projectColorDTO);
 }

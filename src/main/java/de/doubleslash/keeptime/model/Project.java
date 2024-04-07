@@ -19,6 +19,8 @@ package de.doubleslash.keeptime.model;
 import jakarta.persistence.*;
 
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
 import javafx.scene.paint.Color;
 
 @Entity
@@ -30,6 +32,7 @@ public class Project {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
+   @NotEmpty(message = "Name must not be null or empty")
    private String name;
 
    @Lob
@@ -39,20 +42,17 @@ public class Project {
    private Color color;
 
    private boolean isWork;
-
    private boolean isDefault;
-
    private boolean isEnabled;
 
+   @PositiveOrZero(message = "Index must not be negative")
    private int index;
 
    public Project() {
       // Needed for jpa
    }
 
-   public Project(final String name, final String description, final Color color, final boolean isWork, final int index,
-         final boolean isDefault) {
-      super();
+   public Project(String name, String description, Color color, boolean isWork, int index, boolean isDefault) {
       this.name = name;
       this.description = description;
       this.color = color;
@@ -62,8 +62,7 @@ public class Project {
       this.index = index;
    }
 
-   public Project(final String name, final String description, final Color color, final boolean isWork,
-         final int index) {
+   public Project(String name, String description, Color color, boolean isWork, int index) {
       this(name, description, color, isWork, index, false);
    }
 
@@ -71,7 +70,7 @@ public class Project {
       return name;
    }
 
-   public void setName(final String name) {
+   public void setName(String name) {
       this.name = name;
    }
 
@@ -79,7 +78,7 @@ public class Project {
       return color;
    }
 
-   public void setColor(final Color color) {
+   public void setColor(Color color) {
       this.color = color;
    }
 
@@ -87,7 +86,7 @@ public class Project {
       return isWork;
    }
 
-   public void setWork(final boolean isWork) {
+   public void setWork(boolean isWork) {
       this.isWork = isWork;
    }
 
@@ -95,7 +94,7 @@ public class Project {
       return isDefault;
    }
 
-   public void setDefault(final boolean isDefault) {
+   public void setDefault(boolean isDefault) {
       this.isDefault = isDefault;
    }
 
@@ -103,7 +102,7 @@ public class Project {
       return isEnabled;
    }
 
-   public void setEnabled(final boolean isEnabled) {
+   public void setEnabled(boolean isEnabled) {
       this.isEnabled = isEnabled;
    }
 
@@ -115,7 +114,7 @@ public class Project {
       return index;
    }
 
-   public void setIndex(final int index) {
+   public void setIndex(int index) {
       this.index = index;
    }
 
@@ -123,7 +122,7 @@ public class Project {
       return description;
    }
 
-   public void setDescription(final String description) {
+   public void setDescription(String description) {
       this.description = description;
    }
 
@@ -132,5 +131,4 @@ public class Project {
       return "Project [id=" + id + ", name=" + name + ", description=" + description + ", color=" + color + ", isWork="
             + isWork + ", isDefault=" + isDefault + ", isEnabled=" + isEnabled + ", index=" + index + "]";
    }
-
 }
