@@ -36,7 +36,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>17</java.version>
-    <javafx.version>20.0.1</javafx.version>
+    <javafx.version>22</javafx.version>
 
     <maven-dependency-check.version>8.0.2</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
