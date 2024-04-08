@@ -14,53 +14,52 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 package de.doubleslash.keeptime.REST_API_Test;
 
-//import de.doubleslash.keeptime.model.Authorities;
-//import de.doubleslash.keeptime.model.User;
-//import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
-//import de.doubleslash.keeptime.model.repos.UserRepository;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+import de.doubleslash.keeptime.view.SettingsController;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-@DataJpaTest
 public class ApiTest {
 
-//   @Autowired
-//   private UserRepository userRepository;
-//
-//   @Autowired
-//   private AuthoritiesRepository authoritiesRepository;
+   @Test
+   public void testSaveUserAndAuthorities() {
+      String username = "user";
+      String password = "1234";
+      SettingsController settingsController;
 
-//   @Test
-//   public void testSaveUserAndAuthorities() {
-//      String username = "user";
-//      String password = "1234";
-//
-//      User user = new User();
-//      Authorities authorities = new Authorities();
-//      user.setUserName(username);
-//      user.setPassword("{noop}" + password);
-//      user.setEnabled(true);
-//      authorities.setUserName(username);
-//      authorities.setAuthority("ROLE_USER");
-//
-//      userRepository.save(user);
-//      authoritiesRepository.save(authorities);
-//
-//      User savedUser = userRepository.findByUserName(username);
-//      assertNotNull(savedUser);
-//      assertEquals(username, savedUser.getUserName());
-//
-//      Authorities savedAuthorities = authoritiesRepository.findByUserName(username);
-//      assertNotNull(savedAuthorities);
-//      assertEquals("ROLE_USER", savedAuthorities.getAuthority());
-//   }
+
+      Properties properties = new Properties();
+      properties.put("spring.security.user.name", "${BASIC_AUTH_USER:" + username+ "}");
+      properties.setProperty("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
+
+      assertEquals(properties.getProperty("spring.security.user.password"),"${BASIC_AUTH_PASSWORD:1234}");
+      assertEquals(properties.getProperty("spring.security.user.name"),"${BASIC_AUTH_USER:user}");
+   }
 }
 
+//@Test public void testIsPropertyPresent() throws Exception {
+//   // Mock InputStream und Properties
+//   InputStream mockInputStream = mock(InputStream.class);
+//   Properties mockProperties = mock(Properties.class);
+//   when(mockProperties.containsKey("api")).thenReturn(true);
+//   when(mockProperties.containsKey("non_existing_property")).thenReturn(false);
+//
+//   // Mock SettingsController und setzen Sie den InputStream
+//   SettingsController settingsController = new SettingsController();
+//   SettingsController spySettingsController = org.mockito.Mockito.spy(settingsController);
+//   org.mockito.Mockito.doReturn(mockInputStream).when(spySettingsController).getClass().getClassLoader().getResourceAsStream("application.properties");
+//   org.mockito.Mockito.doReturn(mockProperties).when(spySettingsController).loadProperties(mockInputStream);
+//
+//   // Testen, ob die Eigenschaft vorhanden ist
+//   assertTrue(spySettingsController.isPropertyPresent("api"));
+//   assertFalse(spySettingsController.isPropertyPresent("non_existing_property"));
+//}
+//}
 

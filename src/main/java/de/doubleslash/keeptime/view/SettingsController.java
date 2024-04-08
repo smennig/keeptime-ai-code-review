@@ -198,8 +198,8 @@ public class SettingsController {
 
    private Stage thisStage;
 
-   private String username;
-   private String password;
+   public String username;
+   public String password;
 
    @Autowired
    ViewController mainscreen;
@@ -254,11 +254,18 @@ public class SettingsController {
                radioApiOn.setSelected(true);
                radioApiOff.setSelected(false);
                String port = properties.getProperty("server.port");
+               String userName = properties.getProperty("spring.security.user.name");
+               String userPassword = properties.getProperty("spring.security.user.password");
+
+
                if (port != null) {
                   authPort.setText(port);
+
                }
-               if (username != null) {
-                  authName.setText(username);
+               if (userName != null) {
+                  authName.setText(extractValue(userName));
+                  authPassword.setText(extractValue(userPassword));
+
                }
             } else if (apistatus.equals("OFF")) {
                radioApiOn.setSelected(false);
@@ -678,5 +685,11 @@ public class SettingsController {
       } catch (IOException e) {
          e.printStackTrace();
       }
+   }
+
+   public static String extractValue(String input) {
+      int startIndex = input.indexOf(":") + 1;
+      int endIndex = input.lastIndexOf("}");
+      return input.substring(startIndex, endIndex);
    }
 }
