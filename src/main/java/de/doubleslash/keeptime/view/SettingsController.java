@@ -198,9 +198,6 @@ public class SettingsController {
 
    private Stage thisStage;
 
-   public String username;
-   public String password;
-
    @Autowired
    ViewController mainscreen;
 
@@ -257,14 +254,13 @@ public class SettingsController {
                String userName = properties.getProperty("spring.security.user.name");
                String userPassword = properties.getProperty("spring.security.user.password");
 
-
                if (port != null) {
                   authPort.setText(port);
 
                }
-               if (userName != null) {
-                  authName.setText(extractValue(userName));
-                  authPassword.setText(extractValue(userPassword));
+               if  (userName!= null) {
+                  authName.setText(LoginController.extractValue(userName));
+                  authPassword.setText(LoginController.extractValue(userPassword));
 
                }
             } else if (apistatus.equals("OFF")) {
@@ -630,10 +626,12 @@ public class SettingsController {
    }
 
    private void handleApiOn() {
-      username = authName.getText();
-      password = authPassword.getText();
+      String username = authName.getText();
+      String password = authPassword.getText();
 
-      createAndSaveUser(username, password);
+      LoginController loginController = new LoginController(username, password);
+
+      loginController.createAndSaveUser();
 
       Map<String, String> propertiesToUpdate = new HashMap<>();
       propertiesToUpdate.put("spring.main.web-application-type", "");
@@ -649,13 +647,7 @@ public class SettingsController {
       propertyWrite("spring.main.web-application-type", value);
    }
 
-   private void createAndSaveUser(String username, String password) {
-      Properties properties = new Properties();
-      properties.setProperty("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
-      properties.setProperty("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
-   }
-
-   private void propertyWrite(String key, String value) {
+   public void propertyWrite(String key, String value) {
       Properties properties = new Properties();
       try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
             FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
@@ -687,9 +679,4 @@ public class SettingsController {
       }
    }
 
-   public static String extractValue(String input) {
-      int startIndex = input.indexOf(":") + 1;
-      int endIndex = input.lastIndexOf("}");
-      return input.substring(startIndex, endIndex);
-   }
 }
