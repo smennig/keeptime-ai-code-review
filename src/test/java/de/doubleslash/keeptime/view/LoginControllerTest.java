@@ -31,14 +31,14 @@ class LoginControllerTest {
 
    @Test
    public void testCreateAndSaveUser() {
-      String username = "testUser";
-      String password = "testPassword";
+      String username = "User";
+      String password = "123A";
       LoginController loginController = new LoginController(username, password);
 
       loginController.createAndSaveUser();
       Properties properties = loginController.properties;
-      assertEquals("${BASIC_AUTH_USER:testUser}", properties.getProperty("spring.security.user.name"));
-      assertEquals("${BASIC_AUTH_PASSWORD:testPassword}", properties.getProperty("spring.security.user.password"));
+      assertEquals("${BASIC_AUTH_USER:User}", properties.getProperty("spring.security.user.name"));
+      assertEquals("${BASIC_AUTH_PASSWORD:123A}", properties.getProperty("spring.security.user.password"));
    }
 }
 

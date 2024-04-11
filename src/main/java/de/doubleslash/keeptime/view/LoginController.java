@@ -13,25 +13,6 @@ public class LoginController {
       this.password = password;
    }
 
-   public String getUsername() {
-      username = extractValue(properties.getProperty("spring.security.user.name"));
-
-      return username;
-   }
-
-   public String getPassword() {
-      password = extractValue(properties.getProperty("spring.security.user.password"));
-      return password;
-   }
-
-   public void setUsername(final String username) {
-      this.username = username;
-   }
-
-   public void setPassword(final String password) {
-      this.password = password;
-   }
-
    public void createAndSaveUser() {
       properties.setProperty("spring.security.user.name", "${BASIC_AUTH_USER:" + this.username + "}");
       properties.setProperty("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + this.password + "}");
