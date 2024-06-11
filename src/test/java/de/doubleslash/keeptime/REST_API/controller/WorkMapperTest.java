@@ -17,6 +17,8 @@
 
 package de.doubleslash.keeptime.REST_API.controller;
 
+import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
+import de.doubleslash.keeptime.REST_API.DTO.ProjectDTO;
 import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
 import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
 import de.doubleslash.keeptime.model.Project;
@@ -55,4 +57,58 @@ class WorkMapperTest {
 
       assertEquals(0, workDTO.getProject().getId());
    }
+
+//   @Test
+//   void WorkDTOToWork() {
+//      // ARRANGE
+//      LocalDateTime startTime = LocalDateTime.of(2024, 4, 19, 9, 0);
+//      LocalDateTime endTime = LocalDateTime.of(2024, 4, 19, 17, 0);
+//
+//      // Erstellen eines ColorDTO-Objekts für das Projekt
+//      ColorDTO colorDTO = new ColorDTO();
+//      colorDTO.setRed(0.0);
+//      colorDTO.setGreen(0.0);
+//      colorDTO.setBlue(1.0);
+//
+//      // Erstellen eines ProjectDTO
+//      ProjectDTO projectDTO = new ProjectDTO(1);
+//      projectDTO.setId(1);
+//
+//
+//      // Erstellen einer WorkDTO
+//      WorkDTO workDTO = new WorkDTO(1, startTime, endTime, projectDTO, "Did something");
+//
+//      // ACT
+//      // Konvertieren der WorkDTO in ein Work-Objekt
+//      Work work = workMapper.workDTOToWork(workDTO);
+//
+//      // ASSERT
+//      // Überprüfen der notwendigen Felder des erstellten Work-Objekts
+//      assertEquals(1, work.getId());
+//
+//   }
+
+
+   @Test
+   public void testWorkDTOToWork() {
+      // Arrange
+      LocalDateTime startTime = LocalDateTime.of(2024, 4, 22, 9, 0); // Beispielzeit
+      LocalDateTime endTime = LocalDateTime.of(2024, 4, 22, 17, 0); // Beispielzeit
+      ProjectDTO projectDTO = new ProjectDTO(0);
+      String notes = "Test Notizen";
+      WorkDTO workDTO = new WorkDTO(1,startTime, endTime, projectDTO, notes);
+
+      // Act
+      Work work = workMapper.workDTOToWork(workDTO);
+
+      // Assert
+      assertNotNull(work);
+      assertEquals(startTime, work.getStartTime());
+      assertEquals(endTime, work.getEndTime());
+      assertNotNull(work.getProject());
+      assertEquals(projectDTO.getId(), work.getProject().getId());
+      assertEquals(notes, work.getNotes());
+   }
+
+
 }

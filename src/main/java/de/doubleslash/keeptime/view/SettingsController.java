@@ -269,7 +269,7 @@ public class SettingsController {
             }
          }
       } catch (IOException e) {
-         e.printStackTrace();
+        LOG.warn("There is currently no application.properties available");
       }
 
       LOG.debug("saveButton.setOnAction");
